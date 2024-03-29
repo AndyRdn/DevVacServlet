@@ -16,6 +16,10 @@ public class Commande {
     Timestamp dateT;
     double montant;
 
+    public Commande(int id) {
+        this.setIdCommande(id);
+    }
+
     public int getIdCommande() {
         return idCommande;
     }
@@ -73,55 +77,56 @@ public class Commande {
         this.montant = montant;
     }
 
-    public void insert(Connection connect) throws Exception {
-        boolean connexionOuvert=false;
-        if (connect == null) {
-            connexionOuvert=true;
-            Connect myConnect=new Connect();
-            connect=myConnect.getConnectionPostgresql();
-        }
+    public void insert() throws Exception {
 
-        String sql="INSERT INTO ? VALUES(NULL,?,?,?,?,?) ";
-        PreparedStatement ppstate= connect.prepareStatement(sql);
-        ppstate.setString(1,"commande");
-        ppstate.setInt(2,this.getIdPlat());
-        ppstate.setInt(3,this.getIdEmployer());
-        ppstate.setInt(4,this.getIdTable());
-        ppstate.setTimestamp(5,this.getDateT());
-        ppstate.setDouble(6,this.getMontant());
+
+
+
+        Connect myConnect=new Connect();
+        Connection connect=null;
+        PreparedStatement ppstate=null;
 
         try {
-
-            ppstate.executeUpdate(sql);
+            connect=myConnect.getConnectionPostgresql();
+            String sql="INSERT INTO commande VALUES(default,?,?,?,?,?) ";
+            ppstate= connect.prepareStatement(sql);
+            ppstate.setInt(1,this.getIdPlat());
+            ppstate.setInt(2,this.getIdEmployer());
+            ppstate.setInt(3,this.getIdTable());
+            ppstate.setTimestamp(4,this.getDateT());
+            ppstate.setDouble(5,this.getMontant());
+            ppstate.executeUpdate();
+            connect.commit();
         } catch (Exception e) {
+            connect.rollback();
             throw e;
         }finally{
             ppstate.close();
-            if (connexionOuvert) {
-                connect.close();
-            }
+            connect.close();
+
         }
     }
 
-    public static Vector<Commande> getAll(Connection connect)throws Exception{
-        boolean connexionOuvert=false;
-        if (connect == null) {
-            connexionOuvert=true;
-            Connect myConnect=new Connect();
-            connect=myConnect.getConnectionPostgresql();
-        }
+    public static Vector<Commande> getAll()throws Exception{
 
-        String sql="SELECT * FROM ? ";
-        PreparedStatement ppstate= connect.prepareStatement(sql);
-        ppstate.setString(1,"commande");
+
+
+
+
+        Connect myConnect=new Connect();
+        Connection connect=null;
+        PreparedStatement ppstate=null;
+        ResultSet result=null;
 
         try {
-
-            ResultSet result= ppstate.executeQuery(sql);
+            connect=myConnect.getConnectionPostgresql();
+            String sql="SELECT * FROM commande ";
+            ppstate= connect.prepareStatement(sql);
+            result= ppstate.executeQuery();
             Vector<Commande> val=new Vector<Commande>();
 
             while (result.next()) {
-                Commande t = new Commande(result.getInt("idcommande"), result.getInt("idplat"), result.getInt("idemployer"), result.getInt("idtable"), result.getTimestamp("dateT"),result.getDouble("montant"));
+                Commande t = new Commande(result.getInt("idcommande"), result.getInt("idsakafo"), result.getInt("idemployer"), result.getInt("idtable"), result.getTimestamp("dateT"),result.getDouble("montant"));
                 val.add(t);
             }
 
@@ -130,67 +135,96 @@ public class Commande {
             throw e;
         }finally{
             ppstate.close();
-            if (connexionOuvert) {
-                connect.close();
-            }
+            connect.close();
+
         }
 
     }
 
-    public void del(Connection connect) throws Exception {
-        boolean connexionOuvert=false;
-        if (connect == null) {
-            connexionOuvert=true;
-            Connect myConnect=new Connect();
-            connect=myConnect.getConnectionPostgresql();
-        }
+    public void del() throws Exception {
 
-        String sql="DELETE FROM ? WHERE idcommande=?";
-        PreparedStatement ppstate= connect.prepareStatement(sql);
-        ppstate.setString(1,"Commande");
-        ppstate.setInt(2,this.getIdCommande());
 
+
+
+
+        Connect myConnect=new Connect();
+        Connection connect=null;
+        PreparedStatement ppstate=null;
 
         try {
-
-            ppstate.executeUpdate(sql);
+            connect=myConnect.getConnectionPostgresql();
+            String sql="DELETE FROM commande WHERE idcommande=?";
+            ppstate= connect.prepareStatement(sql);
+            ppstate.setInt(1,this.getIdCommande());
+            ppstate.executeUpdate();
+            connect.commit();
         } catch (Exception e) {
+            connect.rollback();
             throw e;
         }finally{
             ppstate.close();
-            if (connexionOuvert) {
-                connect.close();
-            }
+            connect.close();
+
         }
     }
 
-    public void update(Connection connect) throws Exception {
-        boolean connexionOuvert=false;
-        if (connect == null) {
-            connexionOuvert=true;
-            Connect myConnect=new Connect();
-            connect=myConnect.getConnectionPostgresql();
-        }
+    public void update() throws Exception {
 
-        String sql="UPDATE ? SET idplat=?, idemployer=?, idtable=?, dateT=?, montant=? WHERE idtable=?";
-        PreparedStatement ppstate= connect.prepareStatement(sql);
-        ppstate.setString(1,"Commande");
-        ppstate.setInt(2,this.getIdPlat());
-        ppstate.setInt(3,this.getIdEmployer());
-        ppstate.setInt(4,this.getIdTable());
-        ppstate.setTimestamp(5,this.getDateT());
-        ppstate.setDouble(6,this.getMontant());
+
+
+
+        Connect myConnect=new Connect();
+        Connection connect=null;
+        PreparedStatement ppstate=null;
 
         try {
-
-            ppstate.executeUpdate(sql);
+            connect=myConnect.getConnectionPostgresql();
+            String sql="UPDATE commande SET idsakafo=?, idemployer=?, idtable=?, dateT=?, montant=? WHERE idcommande=?";
+            ppstate= connect.prepareStatement(sql);
+            ppstate.setInt(1,this.getIdPlat());
+            ppstate.setInt(2,this.getIdEmployer());
+            ppstate.setInt(3,this.getIdTable());
+            ppstate.setTimestamp(4,this.getDateT());
+            ppstate.setDouble(5,this.getMontant());
+            ppstate.setDouble(6,this.getIdCommande());
+            ppstate.executeUpdate();
+            connect.commit();
         } catch (Exception e) {
+            connect.rollback();
             throw e;
         }finally{
             ppstate.close();
-            if (connexionOuvert) {
-                connect.close();
+            connect.close();
+
+        }
+    }
+    public void getById() throws Exception {
+
+            Connect myConnect=new Connect();
+            Connection connect=null;
+            PreparedStatement ppstate=null;
+            ResultSet result=null;
+
+            try {
+            connect=myConnect.getConnectionPostgresql();
+            String sql="SELECT * FROM commande WHERE idcommande = ?";
+            ppstate= connect.prepareStatement(sql);
+            ppstate.setInt(1,this.getIdCommande());
+            result= ppstate.executeQuery();
+            Employer t=null;
+            while (result.next()) {
+            this.setIdPlat(result.getInt("idsakafo"));
+            this.setIdEmployer(result.getInt("idemployer"));
+            this.setIdTable(result.getInt("idtable"));
+            this.setDateT(result.getTimestamp("datet"));
+            this.setMontant(result.getDouble("montant"));
             }
+            } catch (Exception e) {
+            throw e;
+            }finally{
+            ppstate.close();
+            connect.close();
+
         }
     }
 }

@@ -32,47 +32,42 @@ public class Table {
         this.nom = nom;
     }
 
-    public void insert(Connection connect) throws Exception {
-        boolean connexionOuvert=false;
-        if (connect == null) {
-            connexionOuvert=true;
-            Connect myConnect=new Connect();
-            connect=myConnect.getConnectionPostgresql();
-        }
-
-        String sql="INSERT INTO ? VALUES(NULL,?) ";
-        PreparedStatement ppstate= connect.prepareStatement(sql);
-        ppstate.setString(1,"restotable");
-        ppstate.setString(2,this.getNom());
+    public void insert() throws Exception {
+        Connect myConnect=new Connect();
+        Connection connect=null;
+        PreparedStatement ppstate=null;
 
         try {
-
-            ppstate.executeUpdate(sql);
+            connect=myConnect.getConnectionPostgresql();
+            String sql="INSERT INTO restotable VALUES(default,?) ";
+            ppstate= connect.prepareStatement(sql);
+            ppstate.setString(1,this.getNom());
+            ppstate.executeUpdate();
+            connect.commit();
         } catch (Exception e) {
+            connect.rollback();
             throw e;
         }finally{
             ppstate.close();
-            if (connexionOuvert) {
-                connect.close();
-            }
+            connect.close();
+
         }
     }
 
-    public static Vector<Table> getAll(Connection connect)throws Exception{
-        boolean connexionOuvert=false;
-        if (connect == null) {
-            connexionOuvert=true;
-            Connect myConnect=new Connect();
-            connect=myConnect.getConnectionPostgresql();
-        }
+    public static Vector<Table> getAll()throws Exception{
 
-        String sql="SELECT * FROM ? ";
-        PreparedStatement ppstate= connect.prepareStatement(sql);
-        ppstate.setString(1,"restotable");
+
+
+        Connect myConnect=new Connect();
+        Connection connect=null;
+        PreparedStatement ppstate=null;
+        ResultSet result=null;
 
         try {
-
-            ResultSet result= ppstate.executeQuery(sql);
+            connect=myConnect.getConnectionPostgresql();
+            String sql="SELECT * FROM restotable ";
+            ppstate= connect.prepareStatement(sql);
+            result= ppstate.executeQuery();
             Vector<Table> val=new Vector<Table>();
 
             while (result.next()) {
@@ -85,63 +80,86 @@ public class Table {
             throw e;
         }finally{
             ppstate.close();
-            if (connexionOuvert) {
-                connect.close();
-            }
+            connect.close();
+
         }
 
     }
 
-    public void del(Connection connect) throws Exception {
-        boolean connexionOuvert=false;
-        if (connect == null) {
-            connexionOuvert=true;
-            Connect myConnect=new Connect();
-            connect=myConnect.getConnectionPostgresql();
-        }
+    public void del() throws Exception {
 
-        String sql="DELETE FROM ? WHERE idtable=?";
-        PreparedStatement ppstate= connect.prepareStatement(sql);
-        ppstate.setString(1,"restotable");
-        ppstate.setInt(2,this.getIdtable());
+
+
+        Connect myConnect=new Connect();
+        Connection connect=null;
+        PreparedStatement ppstate=null;
 
         try {
-
-            ppstate.executeUpdate(sql);
+            connect=myConnect.getConnectionPostgresql();
+            String sql="DELETE FROM restotable WHERE idtable=?";
+            ppstate= connect.prepareStatement(sql);
+            ppstate.setInt(1,this.getIdtable());
+            ppstate.executeUpdate();
+            connect.commit();
         } catch (Exception e) {
+            connect.rollback();
             throw e;
         }finally{
             ppstate.close();
-            if (connexionOuvert) {
-                connect.close();
-            }
+            connect.close();
+
         }
     }
 
-    public void update(Connection connect) throws Exception {
-        boolean connexionOuvert=false;
-        if (connect == null) {
-            connexionOuvert=true;
-            Connect myConnect=new Connect();
-            connect=myConnect.getConnectionPostgresql();
-        }
+    public void update() throws Exception {
 
-        String sql="UPDATE ? SET NOM=? WHERE idtable=?";
-        PreparedStatement ppstate= connect.prepareStatement(sql);
-        ppstate.setString(1,"restotable");
-        ppstate.setString(2,this.getNom());
-        ppstate.setInt(3,this.getIdtable());
+
+
+        Connect myConnect=new Connect();
+        Connection connect=null;
+        PreparedStatement ppstate=null;
+        try {
+            connect=myConnect.getConnectionPostgresql();
+            String sql="UPDATE restotable SET NOM=? WHERE idtable=?";
+            ppstate= connect.prepareStatement(sql);
+            ppstate.setString(1,this.getNom());
+            ppstate.setInt(2,this.getIdtable());
+            ppstate.executeUpdate();
+            connect.commit();
+        } catch (Exception e) {
+            connect.rollback();
+            throw e;
+        }finally{
+            ppstate.close();
+            connect.close();
+
+        }
+    }
+
+    public void getById() throws Exception {
+
+        Connect myConnect=new Connect();
+        Connection connect=null;
+        PreparedStatement ppstate=null;
+        ResultSet result=null;
 
         try {
+            connect=myConnect.getConnectionPostgresql();
+            String sql="SELECT * FROM restotable WHERE idtable = ?";
+            ppstate= connect.prepareStatement(sql);
+            ppstate.setInt(1,this.getIdtable());
+            result= ppstate.executeQuery();
+            Employer t=null;
+            while (result.next()) {
+                this.setNom(result.getString("nom"));
+            }
 
-            ppstate.executeUpdate(sql);
         } catch (Exception e) {
             throw e;
         }finally{
             ppstate.close();
-            if (connexionOuvert) {
-                connect.close();
-            }
+            connect.close();
+
         }
     }
 }

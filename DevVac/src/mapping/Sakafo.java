@@ -12,6 +12,14 @@ public class Sakafo {
     String nom;
     double prix;
 
+    public Sakafo() {
+
+    }
+
+    public Sakafo(int id) {
+        this.setIdSakafo(id);
+    }
+
     public int getIdSakafo() {
         return idSakafo;
     }
@@ -42,52 +50,49 @@ public class Sakafo {
         this.prix = prix;
     }
 
-    public void insert(Connection connect) throws Exception {
-        boolean connexionOuvert=false;
-        if (connect == null) {
-            connexionOuvert=true;
-            Connect myConnect=new Connect();
-            connect=myConnect.getConnectionPostgresql();
-        }
+    public void insert() throws Exception {
 
-        String sql="INSERT INTO ? VALUES(NULL,?,?) ";
-        PreparedStatement ppstate= connect.prepareStatement(sql);
-        ppstate.setString(1,"sakafo");
-        ppstate.setString(2,this.getNom());
-        ppstate.setDouble(2,this.getPrix());
+        Connect myConnect=new Connect();
+        Connection connect=null;
+        PreparedStatement ppstate=null;
 
         try {
-
-            ppstate.executeUpdate(sql);
+            connect=myConnect.getConnectionPostgresql();
+            String sql="INSERT INTO sakafo VALUES(default,?,?) ";
+            ppstate= connect.prepareStatement(sql);
+            ppstate.setString(1,this.getNom());
+            ppstate.setDouble(2,this.getPrix());
+            ppstate.executeUpdate();
+            connect.commit();
         } catch (Exception e) {
+            connect.rollback();
             throw e;
         }finally{
             ppstate.close();
-            if (connexionOuvert) {
-                connect.close();
-            }
+            connect.close();
+
         }
     }
 
-    public static Vector<Sakafo> getAll(Connection connect)throws Exception{
-        boolean connexionOuvert=false;
-        if (connect == null) {
-            connexionOuvert=true;
-            Connect myConnect=new Connect();
-            connect=myConnect.getConnectionPostgresql();
-        }
+    public static Vector<Sakafo> getAll()throws Exception{
 
-        String sql="SELECT * FROM ? ";
-        PreparedStatement ppstate= connect.prepareStatement(sql);
-        ppstate.setString(1,"sakafo");
+
+        Connect myConnect=new Connect();
+        Connection connect=null;
+        PreparedStatement ppstate=null;
+        ResultSet result=null;
 
         try {
+            connect=myConnect.getConnectionPostgresql();
 
-            ResultSet result= ppstate.executeQuery(sql);
+            String sql="SELECT * FROM sakafo ";
+            ppstate= connect.prepareStatement(sql);
+
+            result= ppstate.executeQuery();
             Vector<Sakafo> val=new Vector<Sakafo>();
 
             while (result.next()) {
-                Sakafo t = new Sakafo(result.getInt("idsakafo"),result.getString("nom"),result.getDouble("Prix"));
+                Sakafo t = new Sakafo(result.getInt("idsakafo"),result.getString("nomSakafo"),result.getDouble("Prix"));
                 val.add(t);
             }
 
@@ -96,65 +101,118 @@ public class Sakafo {
             throw e;
         }finally{
             ppstate.close();
-            if (connexionOuvert) {
-                connect.close();
-            }
+            connect.close();
+
         }
 
     }
 
-    public void del(Connection connect) throws Exception {
-        boolean connexionOuvert=false;
-        if (connect == null) {
-            connexionOuvert=true;
-            Connect myConnect=new Connect();
-            connect=myConnect.getConnectionPostgresql();
-        }
+    public void del() throws Exception {
 
-        String sql="DELETE FROM ? WHERE idtable=?";
-        PreparedStatement ppstate= connect.prepareStatement(sql);
-        ppstate.setString(1,"Sakafo");
-        ppstate.setInt(2,this.getIdSakafo());
-
+        Connect myConnect=new Connect();
+        Connection connect=null;
+        PreparedStatement ppstate=null;
 
         try {
-
-            ppstate.executeUpdate(sql);
+            connect=myConnect.getConnectionPostgresql();
+            String sql="DELETE FROM sakafo WHERE idsakafo=?";
+            ppstate= connect.prepareStatement(sql);
+            ppstate.setInt(1,this.getIdSakafo());
+            ppstate.executeUpdate();
+            connect.commit();
         } catch (Exception e) {
+            connect.rollback();
             throw e;
         }finally{
             ppstate.close();
-            if (connexionOuvert) {
-                connect.close();
-            }
+            connect.close();
         }
     }
 
-    public void update(Connection connect) throws Exception {
-        boolean connexionOuvert=false;
-        if (connect == null) {
-            connexionOuvert=true;
-            Connect myConnect=new Connect();
-            connect=myConnect.getConnectionPostgresql();
-        }
+    public void update() throws Exception {
 
-        String sql="UPDATE ? SET nom=?,prix=? WHERE idtable=?";
-        PreparedStatement ppstate= connect.prepareStatement(sql);
-        ppstate.setString(1,"Sakafo");
-        ppstate.setString(2,this.getNom());
-        ppstate.setDouble(2,this.getPrix());
-        ppstate.setInt(3,this.getIdSakafo());
+
+
+
+        Connect myConnect=new Connect();
+        Connection connect=null;
+        PreparedStatement ppstate=null;
 
         try {
+            connect=myConnect.getConnectionPostgresql();
+            String sql="UPDATE sakafo SET nomsakafo=?,prix=? WHERE idsakafo=?";
+            ppstate= connect.prepareStatement(sql);
+            ppstate.setString(1,this.getNom());
+            ppstate.setDouble(2,this.getPrix());
+            ppstate.setInt(3,this.getIdSakafo());
+            ppstate.executeUpdate();
+            connect.commit();
+        } catch (Exception e) {
+            connect.rollback();
+            throw e;
+        }finally{
+            ppstate.close();
+            connect.close();
 
-            ppstate.executeUpdate(sql);
+        }
+    }
+
+    public void getById() throws Exception {
+
+        Connect myConnect=new Connect();
+        Connection connect=null;
+        PreparedStatement ppstate=null;
+        ResultSet result=null;
+
+        try {
+            connect=myConnect.getConnectionPostgresql();
+            String sql="SELECT * FROM sakafo WHERE idsakafo = ?";
+            ppstate= connect.prepareStatement(sql);
+            ppstate.setInt(1,this.getIdSakafo());
+            result= ppstate.executeQuery();
+            Employer t=null;
+            while (result.next()) {
+                this.setNom(result.getString("nomSakafo"));
+                this.setPrix(result.getDouble("prix"));
+            }
         } catch (Exception e) {
             throw e;
         }finally{
             ppstate.close();
-            if (connexionOuvert) {
-                connect.close();
+            connect.close();
+
+        }
+    }
+
+    public Vector<Sakafo> search(String nom,double prixmin,double prixmax)throws Exception{
+        Connect myConnect=new Connect();
+        Connection connect=null;
+        PreparedStatement ppstate=null;
+        ResultSet result=null;
+
+        try {
+            connect=myConnect.getConnectionPostgresql();
+
+            String sql="SELECT * FROM sakafo WHERE nomsakafo LIKE ? AND prix>? AND prix<?";
+            ppstate= connect.prepareStatement(sql);
+            ppstate.setString(1,"%"+nom+"%");
+            ppstate.setDouble(2,prixmin);
+            ppstate.setDouble(3,prixmax);
+            result= ppstate.executeQuery();
+            Vector<Sakafo> val=new Vector<Sakafo>();
+
+            while (result.next()) {
+                Sakafo t = new Sakafo(result.getInt("idsakafo"),result.getString("nomSakafo"),result.getDouble("Prix"));
+                val.add(t);
             }
+
+            return val;
+        } catch (Exception e) {
+            throw e;
+        }finally{
+            ppstate.close();
+            connect.close();
+
         }
     }
 }

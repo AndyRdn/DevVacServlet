@@ -1,6 +1,6 @@
 CREATE TABLE commande (
     idcommande serial primary key ,
-    idplat smallint,
+    idsakafo smallint,
     idemployer smallint,
     idtable smallint,
     dateT timestamp,
@@ -23,3 +23,13 @@ CREATE TABLE restotable(
     idtable serial primary key ,
     nom varchar(30)
 );
+
+CREATE TABLE login(
+    iduser serial primary key ,
+    email varchar(50),
+    mdp varchar(16)
+);
+
+ALTER TABLE commande add foreign key (idsakafo) references sakafo(idsakafo);
+ALTER TABLE commande add foreign key (idemployer) references employer(idemployer);
+ALTER TABLE commande add foreign key (idtable) references restotable(idtable);

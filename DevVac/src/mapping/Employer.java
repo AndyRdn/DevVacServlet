@@ -11,6 +11,14 @@ public class Employer {
     String nom;
     int age;
 
+    public Employer() {
+
+    }
+
+    public Employer(int id) {
+        this.setIdEmployer(id);
+    }
+
     public int getIdEmployer() {
         return idEmployer;
     }
@@ -41,52 +49,49 @@ public class Employer {
         this.age = age;
     }
 
-    public void insert(Connection connect) throws Exception {
-        boolean connexionOuvert=false;
-        if (connect == null) {
-            connexionOuvert=true;
-            Connect myConnect=new Connect();
-            connect=myConnect.getConnectionPostgresql();
-        }
+    public void insert() throws Exception {
+        Connect myConnect=new Connect();
+        Connection connect=null;
+        PreparedStatement ppstate=null;
 
-        String sql="INSERT INTO ? VALUES(NULL,?,?) ";
-        PreparedStatement ppstate= connect.prepareStatement(sql);
-        ppstate.setString(1,"employer");
-        ppstate.setString(2,this.getNom());
-        ppstate.setDouble(2,this.getAge());
+
 
         try {
-
-            ppstate.executeUpdate(sql);
+            connect=myConnect.getConnectionPostgresql();
+            String sql="INSERT INTO employer VALUES(default,?,?) ";
+            ppstate= connect.prepareStatement(sql);
+            ppstate.setString(1,this.getNom());
+            ppstate.setInt(2,this.getAge());
+            ppstate.executeUpdate();
+            connect.commit();
         } catch (Exception e) {
+            connect.rollback();
             throw e;
         }finally{
             ppstate.close();
-            if (connexionOuvert) {
-                connect.close();
-            }
+            connect.close();
+
         }
     }
 
-    public static Vector<Employer> getAll(Connection connect)throws Exception{
-        boolean connexionOuvert=false;
-        if (connect == null) {
-            connexionOuvert=true;
-            Connect myConnect=new Connect();
-            connect=myConnect.getConnectionPostgresql();
-        }
+    public static Vector<Employer> getAll()throws Exception{
 
-        String sql="SELECT * FROM ? ";
-        PreparedStatement ppstate= connect.prepareStatement(sql);
-        ppstate.setString(1,"employer");
+
+        Connect myConnect=new Connect();
+        Connection connect=null;
+        PreparedStatement ppstate=null;
+        ResultSet result=null;
 
         try {
+            connect=myConnect.getConnectionPostgresql();
+            String sql="SELECT * FROM employer ";
+            ppstate= connect.prepareStatement(sql);
 
-            ResultSet result= ppstate.executeQuery(sql);
+            result= ppstate.executeQuery();
             Vector<Employer> val=new Vector<Employer>();
 
             while (result.next()) {
-                Employer t = new Employer(result.getInt("idsakafo"),result.getString("nom"),result.getDouble("Prix"));
+                Employer t = new Employer(result.getInt("idemployer"),result.getString("nom"),result.getInt("age"));
                 val.add(t);
             }
 
@@ -95,65 +100,82 @@ public class Employer {
             throw e;
         }finally{
             ppstate.close();
-            if (connexionOuvert) {
-                connect.close();
-            }
+            connect.close();
         }
 
     }
 
-    public void del(Connection connect) throws Exception {
-        boolean connexionOuvert=false;
-        if (connect == null) {
-            connexionOuvert=true;
-            Connect myConnect=new Connect();
-            connect=myConnect.getConnectionPostgresql();
-        }
-
-        String sql="DELETE FROM ? WHERE idemployer=?";
-        PreparedStatement ppstate= connect.prepareStatement(sql);
-        ppstate.setString(1,"Employer");
-        ppstate.setInt(2,this.getIdEmployer());
-
+    public void del() throws Exception {
+        Connect myConnect=new Connect();
+        Connection connect=null;
+        PreparedStatement ppstate=null;
 
         try {
-
-            ppstate.executeUpdate(sql);
+            connect=myConnect.getConnectionPostgresql();
+            String sql="DELETE FROM employer WHERE idemployer=?";
+            ppstate= connect.prepareStatement(sql);
+            ppstate.setInt(1,this.getIdEmployer());
+            ppstate.executeUpdate();
+            connect.commit();
         } catch (Exception e) {
+            connect.rollback();
             throw e;
         }finally{
             ppstate.close();
-            if (connexionOuvert) {
-                connect.close();
-            }
+            connect.close();
         }
     }
 
-    public void update(Connection connect) throws Exception {
-        boolean connexionOuvert=false;
-        if (connect == null) {
-            connexionOuvert=true;
-            Connect myConnect=new Connect();
-            connect=myConnect.getConnectionPostgresql();
-        }
+    public void update() throws Exception {
 
-        String sql="UPDATE ? SET nom=?,prix=? WHERE idtable=?";
-        PreparedStatement ppstate= connect.prepareStatement(sql);
-        ppstate.setString(1,"Employer");
-        ppstate.setString(2,this.getNom());
-        ppstate.setDouble(2,this.getAge());
-        ppstate.setInt(3,this.getIdEmployer());
+        Connect myConnect=new Connect();
+        Connection connect=null;
+        PreparedStatement ppstate=null;
 
         try {
+            connect=myConnect.getConnectionPostgresql();
+            String sql="UPDATE employer SET nom=?,prix=? WHERE idtable=?";
+            ppstate= connect.prepareStatement(sql);
+            ppstate.setString(1,this.getNom());
+            ppstate.setDouble(2,this.getAge());
+            ppstate.setInt(3,this.getIdEmployer());
+            ppstate.executeUpdate();
+            connect.commit();
+        } catch (Exception e) {
+            connect.rollback();
+            throw e;
+        }finally{
+            ppstate.close();
+            connect.close();
 
-            ppstate.executeUpdate(sql);
+        }
+    }
+
+    public void getById() throws Exception {
+
+        Connect myConnect=new Connect();
+        Connection connect=null;
+        PreparedStatement ppstate=null;
+        ResultSet result=null;
+
+        try {
+            connect=myConnect.getConnectionPostgresql();
+            String sql="SELECT * FROM employer WHERE idemployer = ?";
+            ppstate= connect.prepareStatement(sql);
+            ppstate.setInt(1,this.getIdEmployer());
+            result= ppstate.executeQuery();
+            Employer t=null;
+            while (result.next()) {
+                this.setNom(result.getString("nom"));
+                this.setAge(result.getInt("age"));
+            }
+
         } catch (Exception e) {
             throw e;
         }finally{
             ppstate.close();
-            if (connexionOuvert) {
-                connect.close();
-            }
+            connect.close();
+
         }
     }
 }
